@@ -22,22 +22,22 @@ checkRules :: forall row rl
 checkRules _ str = const (Const str) <$> checkRulesImpl (RLProxy :: RLProxy rl) str
 
 -- | Rule for checking what the string begins with
-foreign import data BeginsWith :: Symbol -> Type
+data BeginsWith (s :: Symbol)
 
 -- | Rule for checking what the string ends with
-foreign import data EndsWith :: Symbol -> Type
+data EndsWith (s :: Symbol)
 
 -- | Rule for checking what the string contains
-foreign import data Contains :: Symbol -> Type
+data Contains (s :: Symbol)
 
 -- | Rule for checking if the string is capitalized
-foreign import data Capitalized :: Type
+data Capitalized
 
 -- | Rule for checking if the string is all caps
-foreign import data AllCaps :: Type
+data AllCaps
 
 -- | Rule for checking if the string is all lowercase
-foreign import data Lowercase :: Type
+data Lowercase
 
 -- | Type alias for a validated string and its rules
 type ValidatedString (rules :: # Type) = Const String (RProxy rules)
