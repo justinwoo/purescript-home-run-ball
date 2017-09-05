@@ -9,16 +9,17 @@ import Data.Maybe (Maybe(..), isJust)
 import Data.String (Pattern(Pattern), charAt, contains, stripPrefix, stripSuffix)
 import Data.String as S
 import Data.Validation.Semigroup (V, invalid)
+import Data.Variant (Variant, inj)
 import Type.Prelude (class IsSymbol, class RowToList, Proxy(Proxy), RLProxy(RLProxy), RProxy, SProxy(SProxy), reflectSymbol)
 import Type.Row (Cons, Nil, kind RowList)
 
 -- | Check a string for validation rules provided by a row proxy and return a validation result
-checkRules :: forall row rl
+checkRules :: forall row errors rl
    . RowToList row rl
-  => CheckRules rl row
+  => CheckRules rl errors row
   => RProxy row
   -> String
-  -> VS row
+  -> VS errors row
 checkRules _ str = const (Const str) <$> checkRulesImpl (RLProxy :: RLProxy rl) str
 
 -- | Rule for checking what the string begins with
@@ -43,7 +44,7 @@ foreign import data Lowercase :: Type
 type ValidatedString (rules :: # Type) = Const String (RProxy rules)
 
 -- | Type alias for a string validation result, with a list of labels that failed validation
-type VS rules = V (NonEmptyList String) (ValidatedString rules)
+type VS errors rules = V (NonEmptyList (Variant errors)) (ValidatedString rules)
 
 -- ValidateRule
 
@@ -81,22 +82,25 @@ instance validateRuleLowercase :: ValidateRule Lowercase where
 
 -- CheckRules
 
-class CheckRules (rl :: RowList) (rules :: # Type)
-  | rl -> rules where
-  checkRulesImpl :: RLProxy rl -> String -> V (NonEmptyList String) Unit
+class CheckRules (rl :: RowList) (errors :: # Type) (rules :: # Type)
+  | rl -> errors rules where
+  checkRulesImpl :: RLProxy rl -> String -> V (NonEmptyList (Variant errors)) Unit
 
 instance checkRulesCons ::
   ( IsSymbol name
-  , CheckRules tail rules
+  , CheckRules tail errors rules
+  , RowCons name String trash errors
   , ValidateRule ty
-  ) => CheckRules (Cons name ty tail) rules where
+  ) => CheckRules (Cons name ty tail) errors rules where
   checkRulesImpl _ str = curr <> rest
     where
       curr
         | validateRuleImpl (Proxy :: Proxy ty) str = pure unit
-        | otherwise =
-            invalid <<< pure $ reflectSymbol $ SProxy :: SProxy name
+        | otherwise
+        , namep <- SProxy :: SProxy name
+        , name <- reflectSymbol namep =
+            invalid <<< pure $ inj namep name
       rest = checkRulesImpl (RLProxy :: RLProxy tail) str
 
-instance checkRulesNil :: CheckRules Nil rules where
+instance checkRulesNil :: CheckRules Nil errors rules where
   checkRulesImpl _ str = pure unit
