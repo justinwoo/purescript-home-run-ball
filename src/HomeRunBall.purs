@@ -14,12 +14,12 @@ import Type.Prelude (class IsSymbol, class RowToList, Proxy(Proxy), RLProxy(RLPr
 import Type.Row (Cons, Nil, kind RowList)
 
 -- | Check a string for validation rules provided by a row proxy and return a validation result
-checkRules :: forall row errors rl
+checkRules :: forall a row errors rl
    . RowToList row rl
-  => CheckRules rl errors row String
+  => CheckRules rl errors row a
   => RProxy row
-  -> String
-  -> VS errors row
+  -> a
+  -> VS errors row a
 checkRules _ str = const (Const str) <$> checkRulesImpl (RLProxy :: RLProxy rl) str
 
 -- | Rule for checking what the string begins with
@@ -41,10 +41,10 @@ data AllCaps
 data Lowercase
 
 -- | Type alias for a validated string and its rules
-type ValidatedString (rules :: # Type) = Const String (RProxy rules)
+type ValidatedString (rules :: # Type) a = Const a (RProxy rules)
 
 -- | Type alias for a string validation result, with a list of labels that failed validation
-type VS errors rules = V (NonEmptyList (Variant errors)) (ValidatedString rules)
+type VS errors rules a = V (NonEmptyList (Variant errors)) (ValidatedString rules a)
 
 -- ValidateRule
 
