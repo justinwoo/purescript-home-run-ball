@@ -15,7 +15,7 @@ import Test.Spec.Runner (run)
 import Type.Prelude (class RowToList, RProxy(..), SProxy(..))
 
 onlyOnApples ::
-     ValidatedString (beginsApple :: BeginsWith "Apple")
+     ValidatedString (beginsApple :: BeginsWith "Apple") String
   -> String
 onlyOnApples _ = "U R COOL"
 
