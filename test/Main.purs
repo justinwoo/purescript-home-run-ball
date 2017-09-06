@@ -19,12 +19,12 @@ onlyOnApples ::
   -> String
 onlyOnApples _ = "U R COOL"
 
-validOf :: forall errors rules rl
+validOf :: forall a errors rules rl
    . RowToList rules rl
-  => CheckRules rl errors rules
+  => CheckRules rl errors rules a
   => RProxy rules
-  -> String
-  -> V (NonEmptyList (Variant errors)) String
+  -> a
+  -> V (NonEmptyList (Variant errors)) a
 validOf _ s = pure s
 
 rules = RProxy :: RProxy (beginsApple :: BeginsWith "Apple")
