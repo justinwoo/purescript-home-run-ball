@@ -41,10 +41,10 @@ data AllCaps
 data Lowercase
 
 -- | Type alias for a validated string and its rules
-type ValidatedString (rules :: # Type) a = Const a (RProxy rules)
+type ValidatedValue (rules :: # Type) a = Const a (RProxy rules)
 
 -- | Type alias for a string validation result, with a list of labels that failed validation
-type VS errors rules a = V (NonEmptyList (Variant errors)) (ValidatedString rules a)
+type VS errors rules a = V (NonEmptyList (Variant errors)) (ValidatedValue rules a)
 
 -- ValidateRule
 

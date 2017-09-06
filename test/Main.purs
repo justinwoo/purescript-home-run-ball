@@ -7,7 +7,7 @@ import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Validation.Semigroup (V, invalid, isValid)
 import Data.Variant (Variant, prj)
-import HomeRunBall (class CheckRules, BeginsWith, ValidatedString, checkRules)
+import HomeRunBall (class CheckRules, BeginsWith, ValidatedValue, checkRules)
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter (consoleReporter)
@@ -15,7 +15,7 @@ import Test.Spec.Runner (run)
 import Type.Prelude (class RowToList, RProxy(..), SProxy(..))
 
 onlyOnApples ::
-     ValidatedString (beginsApple :: BeginsWith "Apple") String
+     ValidatedValue (beginsApple :: BeginsWith "Apple") String
   -> String
 onlyOnApples _ = "U R COOL"
 
