@@ -7,7 +7,7 @@ import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Validation.Semigroup (V, invalid, isValid)
 import Data.Variant (Variant, prj)
-import HomeRunBall (class CheckRules, BeginsWith, ValidatedValue, checkRules)
+import HomeRunBall (class CheckRules, class ValidateRule, BeginsWith, ValidatedValue, checkRules)
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter (consoleReporter)
@@ -32,6 +32,19 @@ rules = RProxy :: RProxy (beginsApple :: BeginsWith "Apple")
 expected :: V (NonEmptyList (Variant (beginsApple :: String))) String
 expected = validOf rules "U R COOL"
 
+extractBeginsApple ::
+     Variant (beginsApple :: String)
+  -> Maybe String
+extractBeginsApple = prj (SProxy :: SProxy "beginsApple")
+
+-- let's check if a number is even
+data Even
+
+instance validateRuleEven :: ValidateRule Even Int where
+  validateRuleImpl _ n = mod n 2 == 0
+
+intRules = RProxy :: RProxy (isEven :: Even)
+
 main :: _
 main = run [consoleReporter] do
   describe "purescript-home-run-ball" do
@@ -47,7 +60,7 @@ main = run [consoleReporter] do
       isValid checkedString `shouldEqual` false
       invalid (pure $ Just "beginsApple") `shouldEqual` (map extractBeginsApple `lmap` checkedString)
 
-extractBeginsApple ::
-     Variant (beginsApple :: String)
-  -> Maybe String
-extractBeginsApple = prj (SProxy :: SProxy "beginsApple")
+    it "works with Int too!" do
+      let
+        checkedNumber = checkRules intRules 4
+      isValid checkedNumber `shouldEqual` true
