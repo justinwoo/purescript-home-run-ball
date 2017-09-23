@@ -6,6 +6,8 @@ A library for applying a row of rules for validation on any values, returning th
 
 ![](http://i.imgur.com/VOYNDVW.png)
 
+See the [blog post](https://qiita.com/kimagure/items/eeb40541fc56b8dba2cc) about this library.
+
 ## Example
 
 @joneshf made a cool demo [here](https://github.com/joneshf/purescript-home-run-ball-demo) showing off this library and [Sparkle](https://github.com/sharkdp/purescript-sparkle).
