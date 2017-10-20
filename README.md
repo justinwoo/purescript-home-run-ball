@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/justinwoo/purescript-home-run-ball.svg)](https://travis-ci.org/justinwoo/purescript-home-run-ball)
 
-A library for applying a row of rules for validation on any values, returning the original data with the rules applied or a list of the ruled that failed.
+A library for applying a row of rules for validation on any values, returning the original data with the rules applied or a list of the rules that failed.
 
 ![](http://i.imgur.com/VOYNDVW.png)
 
