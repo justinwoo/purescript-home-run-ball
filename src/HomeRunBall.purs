@@ -10,12 +10,13 @@ import Data.String (Pattern(Pattern), charAt, contains, stripPrefix, stripSuffix
 import Data.String as S
 import Data.Validation.Semigroup (V, invalid)
 import Data.Variant (Variant, inj)
-import Type.Prelude (class IsSymbol, class RowToList, Proxy(Proxy), RLProxy(RLProxy), RProxy, SProxy(SProxy), reflectSymbol)
-import Type.Row (Cons, Nil, kind RowList)
+import Prim.Row as Row
+import Prim.RowList as RL
+import Type.Prelude (class IsSymbol, Proxy(..), RLProxy(..), RProxy, SProxy(..), reflectSymbol)
 
 -- | Check a string for validation rules provided by a row proxy and return a validation result
 checkRules :: forall a row errors rl
-   . RowToList row rl
+   . RL.RowToList row rl
   => CheckRules rl errors row a
   => RProxy row
   -> a
@@ -82,16 +83,16 @@ instance validateRuleLowercase :: ValidateRule Lowercase String where
 
 -- CheckRules
 
-class CheckRules (rl :: RowList) (errors :: # Type) (rules :: # Type) a
+class CheckRules (rl :: RL.RowList) (errors :: # Type) (rules :: # Type) a
   | rl -> errors rules where
   checkRulesImpl :: RLProxy rl -> a -> V (NonEmptyList (Variant errors)) Unit
 
 instance checkRulesCons ::
   ( IsSymbol name
   , CheckRules tail errors rules a
-  , RowCons name String trash errors
+  , Row.Cons name String trash errors
   , ValidateRule ty a
-  ) => CheckRules (Cons name ty tail) errors rules a where
+  ) => CheckRules (RL.Cons name ty tail) errors rules a where
   checkRulesImpl _ str = curr <> rest
     where
       curr
@@ -102,5 +103,5 @@ instance checkRulesCons ::
             invalid <<< pure $ inj namep name
       rest = checkRulesImpl (RLProxy :: RLProxy tail) str
 
-instance checkRulesNil :: CheckRules Nil errors rules a where
+instance checkRulesNil :: CheckRules RL.Nil errors rules a where
   checkRulesImpl _ str = pure unit

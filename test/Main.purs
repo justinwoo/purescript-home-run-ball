@@ -7,12 +7,14 @@ import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Validation.Semigroup (V, invalid, isValid)
 import Data.Variant (Variant, prj)
+import Effect (Effect)
 import HomeRunBall (class CheckRules, class ValidateRule, BeginsWith, ValidatedValue, checkRules)
+import Prim.RowList as RL
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter (consoleReporter)
 import Test.Spec.Runner (run)
-import Type.Prelude (class RowToList, RProxy(..), SProxy(..))
+import Type.Prelude (RProxy(..), SProxy(..))
 
 onlyOnApples ::
      ValidatedValue (beginsApple :: BeginsWith "Apple") String
@@ -20,7 +22,7 @@ onlyOnApples ::
 onlyOnApples _ = "U R COOL"
 
 validOf :: forall a errors rules rl
-   . RowToList rules rl
+   . RL.RowToList rules rl
   => CheckRules rl errors rules a
   => RProxy rules
   -> a
@@ -45,7 +47,7 @@ instance validateRuleEven :: ValidateRule Even Int where
 
 intRules = RProxy :: RProxy (isEven :: Even)
 
-main :: _
+main :: Effect Unit
 main = run [consoleReporter] do
   describe "purescript-home-run-ball" do
     it "works with valid string" do
