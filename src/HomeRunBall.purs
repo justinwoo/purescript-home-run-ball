@@ -2,14 +2,15 @@ module HomeRunBall where
 
 import Prelude
 
-import Data.Char (toUpper)
 import Data.Const (Const(..))
 import Data.List.NonEmpty (NonEmptyList)
 import Data.Maybe (Maybe(..), isJust)
-import Data.String (Pattern(Pattern), charAt, contains, stripPrefix, stripSuffix)
+import Data.String (Pattern(Pattern), contains, stripPrefix, stripSuffix)
 import Data.String as S
+import Data.String.CodeUnits as SCU
 import Data.Validation.Semigroup (V, invalid)
 import Data.Variant (Variant, inj)
+import Prim.Row as Row
 import Type.Prelude (class IsSymbol, class RowToList, Proxy(Proxy), RLProxy(RLProxy), RProxy, SProxy(SProxy), reflectSymbol)
 import Type.Row (Cons, Nil, kind RowList)
 
@@ -71,7 +72,7 @@ instance validateRuleContains ::
 
 instance validateRuleCapitalized :: ValidateRule Capitalized String where
   validateRuleImpl _ str
-    | Just head <- charAt 0 str = toUpper head == head
+    | Just (head :: String) <- SCU.singleton <$> SCU.charAt 0 str = S.toUpper head == head
     | otherwise = false
 
 instance validateRuleAllCaps :: ValidateRule AllCaps String where
@@ -89,7 +90,7 @@ class CheckRules (rl :: RowList) (errors :: # Type) (rules :: # Type) a
 instance checkRulesCons ::
   ( IsSymbol name
   , CheckRules tail errors rules a
-  , RowCons name String trash errors
+  , Row.Cons name String trash errors
   , ValidateRule ty a
   ) => CheckRules (Cons name ty tail) errors rules a where
   checkRulesImpl _ str = curr <> rest

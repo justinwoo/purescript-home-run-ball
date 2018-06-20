@@ -7,6 +7,7 @@ import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Validation.Semigroup (V, invalid, isValid)
 import Data.Variant (Variant, prj)
+import Effect (Effect)
 import HomeRunBall (class CheckRules, class ValidateRule, BeginsWith, ValidatedValue, checkRules)
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -45,7 +46,7 @@ instance validateRuleEven :: ValidateRule Even Int where
 
 intRules = RProxy :: RProxy (isEven :: Even)
 
-main :: _
+main :: Effect Unit
 main = run [consoleReporter] do
   describe "purescript-home-run-ball" do
     it "works with valid string" do
